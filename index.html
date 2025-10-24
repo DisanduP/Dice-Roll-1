@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dice Roll Game</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Arial', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            color: white;
+        }
+
+        .container {
+            text-align: center;
+            background: rgba(255, 255, 255, 0.1);
+            padding: 40px;
+            border-radius: 20px;
+            backdrop-filter: blur(10px);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+        }
+
+        h1 {
+            font-size: 2.5em;
+            margin-bottom: 30px;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+        }
+
+        .dice-container {
+            margin: 40px 0;
+            perspective: 1000px;
+        }
+
+        .dice {
+            width: 120px;
+            height: 120px;
+            background: white;
+            border-radius: 15px;
+            display: inline-flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 60px;
+            color: #667eea;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+            transition: transform 0.1s;
+        }
+
+        .dice.rolling {
+            animation: roll 0.6s ease-in-out;
+        }
+
+        @keyframes roll {
+            0%, 100% { transform: rotateX(0) rotateY(0); }
+            25% { transform: rotateX(180deg) rotateY(180deg); }
+            50% { transform: rotateX(360deg) rotateY(360deg); }
+            75% { transform: rotateX(540deg) rotateY(540deg); }
+        }
+
+        .roll-btn {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            color: white;
+            border: none;
+            padding: 15px 50px;
+            font-size: 1.2em;
+            border-radius: 50px;
+            cursor: pointer;
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.3);
+            transition: all 0.3s;
+            font-weight: bold;
+        }
+
+        .roll-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.4);
+        }
+
+        .roll-btn:active {
+            transform: translateY(0);
+        }
+
+        .roll-btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .result {
+            margin-top: 30px;
+            font-size: 1.5em;
+            min-height: 40px;
+            text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.3);
+        }
+
+        .stats {
+            margin-top: 30px;
+            display: flex;
+            justify-content: space-around;
+            gap: 20px;
+        }
+
+        .stat-box {
+            background: rgba(255, 255, 255, 0.2);
+            padding: 15px 25px;
+            border-radius: 10px;
+            min-width: 100px;
+        }
+
+        .stat-label {
+            font-size: 0.9em;
+            opacity: 0.9;
+            margin-bottom: 5px;
+        }
+
+        .stat-value {
+            font-size: 1.8em;
+            font-weight: bold;
+        }
+
+        .dice-dot {
+            display: inline-block;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🎲 Roll the Dice! 🎲</h1>
+        
+        <div class="dice-container">
+            <div class="dice" id="dice">
+                <span class="dice-dot">?</span>
+            </div>
+        </div>
+
+        <button class="roll-btn" id="rollBtn" onclick="rollDice()">Roll Dice</button>
+
+        <div class="result" id="result">Click to roll!</div>
+
+        <div class="stats">
+            <div class="stat-box">
+                <div class="stat-label">Total Rolls</div>
+                <div class="stat-value" id="totalRolls">0</div>
+            </div>
+            <div class="stat-box">
+                <div class="stat-label">Last Roll</div>
+                <div class="stat-value" id="lastRoll">-</div>
+            </div>
+            <div class="stat-box">
+                <div class="stat-label">Highest</div>
+                <div class="stat-value" id="highest">-</div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const diceDots = {
+            1: '⚀',
+            2: '⚁',
+            3: '⚂',
+            4: '⚃',
+            5: '⚄',
+            6: '⚅'
+        };
+
+        let totalRolls = 0;
+        let lastRoll = 0;
+        let highest = 0;
+
+        function rollDice() {
+            const dice = document.getElementById('dice');
+            const rollBtn = document.getElementById('rollBtn');
+            const result = document.getElementById('result');
+
+            rollBtn.disabled = true;
+            dice.classList.add('rolling');
+            result.textContent = 'Rolling...';
+
+            let counter = 0;
+            const interval = setInterval(() => {
+                const randomNum = Math.floor(Math.random() * 6) + 1;
+                dice.querySelector('.dice-dot').textContent = diceDots[randomNum];
+                counter++;
+
+                if (counter >= 10) {
+                    clearInterval(interval);
+                    finishRoll();
+                }
+            }, 50);
+        }
+
+        function finishRoll() {
+            const dice = document.getElementById('dice');
+            const rollBtn = document.getElementById('rollBtn');
+            const result = document.getElementById('result');
+
+            setTimeout(() => {
+                const finalNumber = Math.floor(Math.random() * 6) + 1;
+                dice.querySelector('.dice-dot').textContent = diceDots[finalNumber];
+                dice.classList.remove('rolling');
+                rollBtn.disabled = false;
+
+                totalRolls++;
+                lastRoll = finalNumber;
+                if (finalNumber > highest || highest === 0) {
+                    highest = finalNumber;
+                }
+
+                document.getElementById('totalRolls').textContent = totalRolls;
+                document.getElementById('lastRoll').textContent = lastRoll;
+                document.getElementById('highest').textContent = highest;
+
+                if (finalNumber === 6) {
+                    result.textContent = '🎉 You rolled a 6! Amazing!';
+                } else if (finalNumber === 1) {
+                    result.textContent = '😅 You rolled a 1. Better luck next time!';
+                } else {
+                    result.textContent = `You rolled a ${finalNumber}!`;
+                }
+            }, 100);
+        }
+    </script>
+</body>
+</html>
